@@ -1,0 +1,50 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lg_l7_app
+    restart: unless-stopped
+    working_dir: /var/www
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www
+      - ./.env.docker:/var/www/.env
+      - /var/www/vendor
+    env_file:
+      - .env.docker
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lg_l7_network
+
+  db:
+    image: mysql:8.0
+    container_name: lg_l7_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: lg_desafio_l7
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_PASSWORD: secret
+      MYSQL_USER: laravel
+    ports:
+      - "3306:3306"
+    volumes:
+      - lg_l7_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psecret"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - lg_l7_network
+
+networks:
+  lg_l7_network:
+    driver: bridge
+
+volumes:
+  lg_l7_mysql_data:
+    driver: local

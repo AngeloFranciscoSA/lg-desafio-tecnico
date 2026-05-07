@@ -1,0 +1,10 @@
+vendor
+node_modules
+.git
+.env
+.idea
+storage/logs/*.log
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+.claude-usage.jsonl
